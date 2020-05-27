@@ -26,12 +26,24 @@ type
     
 
 proc `$`*(r: WRequest): string =
-  result = "hostname: " & r.hostname & " , method: " & $r.reqMethod &
-    " , url: " & $r.url & " , headers: " & $r.headers &
-    " , protocol" & $r.protocol & " , urlpath: " & $r.urlpath &
-    " , paramList: " & $r.paramList &
-    " , paramTable: " & $r.paramTable &
-    " , body: " & $r.body
+  if r.hostname != "":
+    result = "hostname: " & r.hostname
+  if $r.reqMethod != "":
+    result = result & " , method: " & $r.reqMethod
+  if $r.url != "":
+    result = result & " , url: " & $r.url
+  #if $r.headers != "":
+  result = result & " , headers: " & $r.headers
+  if $r.protocol != "":
+    result = result & " , protocol" & $r.protocol
+  if $r.urlpath != "":
+    result = result & " , urlpath: " & $r.urlpath
+  if $r.paramList != "":
+    result = result & " , paramList: " & $r.paramList
+  if $r.paramTable != "":
+    result = result & " , paramTable: " & $r.paramTable
+  if r.body != "":
+    result = result & " , body: " & $r.body
     
 
 proc `$`*(r: WResponse): string =
@@ -39,7 +51,11 @@ proc `$`*(r: WResponse): string =
     " , body: " & r.body
 
 proc `$`*(c: WebContext): string =
-  result = "WebContext: \nRequest: " & $c.request & "\nResponse: " & $c.response 
+  result = "WebContext:"
+  if not c.request.isNil:
+    result = result & " \nRequest: " & $c.request
+  if not c.response.isNil:
+    result = result & "\nResponse: " & $c.response
 
 
 proc copy*(c: WebContext): WebContext =
