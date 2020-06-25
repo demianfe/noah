@@ -61,3 +61,13 @@ proc prepareHeaders(headers: HttpHeaders): string =
         h = h & "\c\L"
       result = result & h
       indx += 1
+
+proc send*(req: Request, ctxt: WebContext) =
+  # wraps httpbeast req.send()
+  # FIXME: bogus request using same httpclient kills the service
+  let res = ctxt.response
+  var h = res.headers
+  h["Content-Length"] = $ctxt.response.body.len
+  let headers = prepareHeaders(h)
+  req.send(res.status, res.body, headers)
+

@@ -9,5 +9,3 @@ when defined(windows):
 when defined(linux):
   import noah / beastcontext
   export beastcontext
-
-
