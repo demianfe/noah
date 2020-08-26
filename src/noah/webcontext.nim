@@ -1,6 +1,6 @@
 ## A web context protocol that encapsulates the request and response
 
-import httpcore, strutils, uri, asynchttpserver, tables
+import httpcore, strutils, uri, asynchttpserver, tables, sequtils
 
 type    
   WRequest* = ref object
@@ -10,10 +10,7 @@ type
     reqMethod*: HttpMethod
     headers*: HttpHeaders
     url*: Uri
-    urlpath*: seq[string]
-    paramList*: seq[string]
-    paramTable*: Table[string, string]
-        
+
   WResponse* = ref object
     ## Response encapsulation Protocol
     status*: HttpCode
@@ -23,8 +20,30 @@ type
   WebContext* = ref object
     request*: WRequest
     response*: WResponse
-    
 
+proc urlpath*(req: WRequest): seq[string] =
+  let bpath = split($req.url, "?")
+  if bpath.len > 0:
+    result = split(bpath[0], "/")
+    result.delete(0)
+
+proc paramList*(req: WRequest): seq[string] =
+  let bpath = split($req.url, "?")
+  if bpath.len > 1:
+    let params = split(bpath[1], "&")
+    for p in params:
+      if not p.contains("="):
+        result.add(p)
+
+proc paramTable*(req: WRequest): Table[string, string] =
+  let bpath = split($req.url, "?")
+  if bpath.len > 1:
+    let params = split(bpath[1], "&")
+    for p in params:
+      if p.contains("="):
+        let line = p.split("=")
+        result[line[0]] = line[1]
+    
 proc `$`*(r: WRequest): string =
   if r.hostname != "":
     result = "hostname: " & r.hostname

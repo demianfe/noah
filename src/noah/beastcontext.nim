@@ -19,38 +19,9 @@ proc createWebContext*(r: Request): WebContext =
   #req.protocol = 
   res.status = Http200
   res.headers = req.headers
-  res.body = ""
-  req.paramList = @[]
-  req.paramTable = initTable[string, string]()
-  let bpath = split($req.url, "?")
-  if bpath.len > 0:
-    req.urlpath = split(bpath[0], "/")
-    req.urlpath.delete(0)
-  else: 
-    req.urlpath = @[]
-  if bpath.len > 1:
-    let params = split(bpath[1], "&")
-    for p in params:
-      if p.contains("="):
-        let line = p.split("=")
-        req.paramTable[line[0]] = line[1]
-      else:
-        req.paramList.add(p)
-  
+  res.body = ""  
   result.request = req
   result.response = res
-  
-# proc toString*(h: HttpHeaders): string =
-#   result = ""
-#   if h.len > 0:
-#     for key, val in h.pairs:
-#       echo key, ": ",  val
-#       var values = ""
-#       if val.len > 0:
-#         for v in val:
-#           values.add(v & ",")
-#         values.delete(values.len - 1, values.len)
-#       result.add(key & ": " & val & "\n")
 
 proc prepareHeaders(headers: HttpHeaders): string =
   var indx = 0 
@@ -61,6 +32,9 @@ proc prepareHeaders(headers: HttpHeaders): string =
         h = h & "\c\L"
       result = result & h
       indx += 1
+  
+proc toString*(h: HttpHeaders): string =
+  result = prepareHeaders h
 
 proc send*(req: Request, ctxt: WebContext) =
   # wraps httpbeast req.send()

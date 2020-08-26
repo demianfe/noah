@@ -1,9 +1,10 @@
 import strutils, uri, httpcore, os, mimetypes, md5
 import webcontext
 
-const staticDir = "public"
+#const staticDir = "public"
 
-proc readStaticFile*(ctx: WebContext): WebContext =
+proc readStaticFile*(ctx: WebContext, staticDir = "public"): WebContext =
+    
   result = ctx.copy()
   var requestedfile = $ctx.request.url
   if requestedfile == "" or requestedfile == "/":
